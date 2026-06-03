@@ -63,6 +63,37 @@ GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON=google/service-account.json
 GOOGLE_DRIVE_ROOT_FOLDER_ID=your-root-folder-or-shared-drive-id
 ```
 
+## Google Cloud & Shared Drive Setup Guide
+
+To use this package, you need a Google Service Account credentials file (`service-account.json`) and a shared folder or Shared Drive.
+
+### 1. How to obtain `service-account.json`
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project or select an existing one.
+3. Enable the **Google Drive API**:
+   - Navigate to **APIs & Services > Library**.
+   - Search for "Google Drive API" and click **Enable**.
+4. Create a **Service Account**:
+   - Navigate to **APIs & Services > Credentials**.
+   - Click **Create Credentials** and choose **Service Account**.
+   - Enter service account details and click **Create and Continue**, then **Done**.
+5. Create and download the JSON key:
+   - Click on the newly created service account from the list.
+   - Go to the **Keys** tab.
+   - Click **Add Key > Create new key**.
+   - Select **JSON** and click **Create**.
+   - A JSON file will be downloaded. Rename it (e.g. `service-account.json`) and place it under `storage/app/google/service-account.json` (or use an absolute path).
+
+### 2. How to Setup Google Drive / Shared Drive Access
+For the service account to interact with your Google Drive folder, you must share the target folder with the service account:
+1. Open the downloaded JSON credentials file.
+2. Find and copy the `"client_email"` value (looks like `service-account-name@project-id.iam.gserviceaccount.com`).
+3. Open Google Drive in your browser.
+4. Right-click the folder or Shared Drive you want to use as the root, and select **Share** (or **Manage members** for Shared Drives).
+5. Paste the service account's client email and assign it the **Editor** (or **Content Manager** / **Contributor**) role.
+6. Copy the Folder ID from the browser URL (e.g. in `https://drive.google.com/drive/folders/1aBcDeFgHiJkLmNoPqRsTuVwXyZ`, the folder ID is `1aBcDeFgHiJkLmNoPqRsTuVwXyZ`).
+7. Add this folder ID into your `.env` file as `GOOGLE_DRIVE_ROOT_FOLDER_ID`.
+
 ---
 
 ## Media Library Usage
