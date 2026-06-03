@@ -26,6 +26,8 @@ class GoogleSharedDriveServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/google-shared-drive.php' => config_path('google-shared-drive.php'),
