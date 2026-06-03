@@ -6,7 +6,7 @@ use Ikhsant\LaravelGoogleSharedDrive\Services\GoogleDriveService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array upload(\Illuminate\Http\UploadedFile $file, ?string $folderPath = null)
+ * @method static array upload(\Illuminate\Http\UploadedFile $file, ?string $folderPath = null, ?string $customFileName = null)
  * @method static string download(string $fileId)
  * @method static bool delete(string $fileId)
  *

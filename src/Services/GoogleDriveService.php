@@ -23,9 +23,8 @@ class GoogleDriveService
             $jsonPath = config('google-shared-drive.service_account_json')
                 ?? config('services.google_drive.service_account_json');
 
-            $client->setAuthConfig(
-                storage_path('app/'.$jsonPath)
-            );
+            $filePath = file_exists($jsonPath) ? $jsonPath : storage_path('app/'.$jsonPath);
+            $client->setAuthConfig($filePath);
 
             $client->addScope(Drive::DRIVE);
 
@@ -38,7 +37,7 @@ class GoogleDriveService
     /**
      * Upload a file to Google Drive.
      */
-    public function upload(UploadedFile $file, ?string $folderPath = null): array
+    public function upload(UploadedFile $file, ?string $folderPath = null, ?string $customFileName = null): array
     {
         $rootFolderId = config('google-shared-drive.root_folder_id')
             ?? config('services.google_drive.root_folder_id');
@@ -46,7 +45,7 @@ class GoogleDriveService
         try {
             $targetFolderId = $this->resolveFolderPath($folderPath, $rootFolderId);
 
-            return $this->uploadToFolder($file, $targetFolderId);
+            return $this->uploadToFolder($file, $targetFolderId, $customFileName);
         } catch (\Exception $e) {
             // Self-healing: If upload failed and a folderPath was used, the folder might
             // have been deleted manually on Google Drive. Clear the cache and retry once.
@@ -57,7 +56,7 @@ class GoogleDriveService
 
                 $targetFolderId = $this->resolveFolderPath($folderPath, $rootFolderId);
 
-                return $this->uploadToFolder($file, $targetFolderId);
+                return $this->uploadToFolder($file, $targetFolderId, $customFileName);
             }
 
             throw $e;
@@ -67,15 +66,16 @@ class GoogleDriveService
     /**
      * Upload the file directly to the given target parent folder ID.
      */
-    protected function uploadToFolder(UploadedFile $file, ?string $targetFolderId): array
+    protected function uploadToFolder(UploadedFile $file, ?string $targetFolderId, ?string $customFileName = null): array
     {
         $parents = [];
         if ($targetFolderId && $targetFolderId !== 'ISI_FOLDER_ID_ROOT_GOOGLE_DRIVE') {
             $parents = [$targetFolderId];
         }
 
+        $fileName = $customFileName ?? $file->getClientOriginalName();
         $metadataParams = [
-            'name' => $file->getClientOriginalName(),
+            'name' => $fileName,
         ];
 
         if (! empty($parents)) {

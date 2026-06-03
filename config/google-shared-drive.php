@@ -10,4 +10,9 @@ return [
      * The model that should be used for storing media records.
      */
     'media_model' => Media::class,
+
+    /*
+     * The default disk name stored in the media table.
+     */
+    'disk' => 'google_drive',
 ];

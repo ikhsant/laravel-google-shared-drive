@@ -5,7 +5,7 @@ An easy-to-use Laravel package to integrate Google Drive and Shared Drive APIs w
 ## Features
 
 - Simple upload, download, and delete operations on Google Shared Drive.
-- Spatie-inspired fluent media attachments (`$model->addMedia($file)->toMediaCollection()`).
+- Spatie-inspired fluent media attachments (`$model->addMedia($file)->toFolder('custom/path')->toMediaCollection()`).
 - Automatic Google Drive file deletion via Eloquent model event listeners.
 - Custom media model configuration.
 - Clean Laravel Facade integration to minimize boilerplate code.
@@ -48,6 +48,11 @@ return [
      * The model that should be used for storing media records.
      */
     'media_model' => Media::class,
+
+    /*
+     * The default disk name stored in the media table.
+     */
+    'disk' => 'google_drive',
 ];
 ```
 
@@ -78,13 +83,17 @@ class Consultation extends Model
 
 ### 2. Upload / Associate Media Fluently
 
-You can upload a file and associate it with the model using the Spatie-inspired fluent API:
+You can upload a file and associate it with the model using the Spatie-inspired fluent API. You can specify a custom nested folder path on Google Drive via `toFolder()`:
 
 ```php
-// Upload a file and attach to a specific collection (defaults to 'default')
+// Upload a file to a nested folder 'consultations/docs', customize filename, and attach to 'attachments' collection
 $media = $consultation->addMedia($request->file('file'))
+    ->toFolder('consultations/docs')
+    ->usingFileName('custom-name.pdf')
     ->toMediaCollection('attachments');
 ```
+
+*Note: Folder path lookup is fully optimized using Laravel's cache. If a folder is manually deleted from Drive, the package auto-detects and self-heals by recreating it.*
 
 ### 3. Retrieve / Download Media Contents
 
@@ -120,7 +129,7 @@ For direct interactions with Google Shared Drive without database models, use th
 ```php
 use Ikhsant\LaravelGoogleSharedDrive\Facades\GoogleSharedDrive;
 
-$result = GoogleSharedDrive::upload($request->file('file'));
+$result = GoogleSharedDrive::upload($request->file('file'), 'custom/folder/path');
 
 // Response:
 // [
@@ -146,4 +155,3 @@ use Ikhsant\LaravelGoogleSharedDrive\Facades\GoogleSharedDrive;
 
 GoogleSharedDrive::delete($fileId);
 ```
-
