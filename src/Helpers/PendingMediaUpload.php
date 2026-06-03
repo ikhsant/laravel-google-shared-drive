@@ -8,6 +8,8 @@ use Illuminate\Http\UploadedFile;
 
 class PendingMediaUpload
 {
+    protected ?string $folderPath = null;
+
     /**
      * Create a new pending media upload instance.
      */
@@ -17,11 +19,21 @@ class PendingMediaUpload
     ) {}
 
     /**
+     * Set the custom target folder path in Google Drive.
+     */
+    public function toFolder(string $path): self
+    {
+        $this->folderPath = $path;
+
+        return $this;
+    }
+
+    /**
      * Upload the file to Google Shared Drive and save the media record in the collection.
      */
     public function toMediaCollection(string $collectionName = 'default'): Model
     {
-        $uploaded = GoogleSharedDrive::upload($this->file);
+        $uploaded = GoogleSharedDrive::upload($this->file, $this->folderPath);
 
         return $this->model->media()->create([
             'collection_name' => $collectionName,
