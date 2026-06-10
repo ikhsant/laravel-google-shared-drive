@@ -42,6 +42,12 @@ class GoogleDriveService
         $rootFolderId = config('google-shared-drive.root_folder_id')
             ?? config('services.google_drive.root_folder_id');
 
+        if (empty($rootFolderId) || $rootFolderId === 'ISI_FOLDER_ID_ROOT_GOOGLE_DRIVE') {
+            throw new \InvalidArgumentException(
+                'Google Drive Root Folder ID is not configured. Service accounts do not have storage quota of their own. You must configure GOOGLE_DRIVE_ROOT_FOLDER_ID with a folder or Shared Drive ID that is shared with the service account client email.'
+            );
+        }
+
         try {
             $targetFolderId = $this->resolveFolderPath($folderPath, $rootFolderId);
 
